@@ -18,20 +18,30 @@ let morrowindFactions = ["Morag Tong"];
 let vampireClans = ["Aundae Clan", "Berne Clan", "Quarra Clan"]
 
 let drives = {
-  "Vigilant": "You desire to clear out every Daedric ruin in Vvardenfell.", "Scholar": "You wish to collect one copy of every book you come across.",
-  "Collector": "You want to collect one of each material of your chosen weapon.", "Exorcist": "You desire to rid the land of the supernatural by hunting down all ghosts, vampires, and lycanthropes.",
-  "They light the way to freedom": "Seek out and complete the Twin Lamps quests.", "Pack Merchant": "Buy goods in town and sell them for a profit in the next",
-  "Hobbyist": "You dabble in a side skill, train one of your miscellanious skills to 100.", "Imperialist": "Complete the Imperial Cult or Legion questlines, even if they are not in your factions list.",
+  "Vigilant": "You desire to clear out every Daedric ruin in Vvardenfell.",
+  "Scholar": "You wish to collect one copy of every book you come across.",
+  "Collector": "You want to collect one of each material of your chosen weapon.",
+  "Exorcist": "You desire to rid the land of the supernatural by hunting down all ghosts, vampires, and lycanthropes.",
+  "They light the way to freedom": "Seek out and complete the Twin Lamps quests.",
+  "Pack Merchant": "Buy goods in town and sell them for a profit in the next",
+  "Hobbyist": "You dabble in a side skill, train one of your miscellanious skills to 100.",
+  "Imperialist": "Complete the Imperial Cult or Legion questlines, even if they are not in your factions list.",
   "Daedrologist": "Complete at least one daedric quest and gain the prince's artefact."
 };
 let ideals = {
-  "Honest": "You never steal, and you never haggle a merchant below their initial price.", "Virtuous": "You always agree to help people when they ask.", "Charitable": "You always give gold to paupers in the streets.",
-  "Robin Hood": "You steal only from the richest nobles.", "Abolitionist": "All slaves you come across must be freed, and their owners killed."
+  "Honest": "You never steal, and you never haggle a merchant below their initial price.",
+  "Virtuous": "You always agree to help people when they ask.",
+  "Charitable": "You always give gold to paupers in the streets.",
+  "Robin Hood": "You steal only from the richest nobles.",
+  "Abolitionist": "All slaves you come across must be freed, and their owners killed."
 };
 let flaws = {
-  "Hydrophobic": "You cannot swim or otherwise enter water, water walking is a must.", "Kleptomaniac": "You must steal at least one thing per day.",
-  "Stubborn": "If caught committing a crime, you will always resist arrest.", "Sentimental": "You never sell your old weapons and armour, but instead display them in your home base.",
-  "Bloodlust": "You must kill an innocent every time you visit a settlement, once per day.", "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
+  "Hydrophobic": "You cannot swim or otherwise enter water, water walking is a must.",
+  "Kleptomaniac": "You must steal at least one thing per day.",
+  "Stubborn": "If caught committing a crime, you will always resist arrest.",
+  "Sentimental": "You never sell your old weapons and armour, but instead display them in your home base.",
+  "Bloodlust": "You must kill an innocent every time you visit a settlement, once per day.",
+  "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
   "Sugartooth": "Once per day you must consume at least one skooma or moon sugar, and you must be in possession of a skooma pipe at all times."
 };
 
@@ -65,7 +75,7 @@ function generateAim(lifestyle) {
 function buildDescription(data) {
   return <div>
     You are {data.name}, a {data.gender.toLowerCase()} {data.race} {data.characterClass.toLowerCase()}.
-    You were born under the sign of The {data.birthsign} in the year 3E{currentYear - data.age}, making you {data.age} years old at the start of the game.
+    You were born under the sign of The {data.birthsign} in the year 3E{currentYear - data.age}.
     You were {data.lifestyle.toLowerCase()} before being arrested and sent to Vvardenfell, and as a result {generateAim(data.lifestyle)}.
   </div>
 }
@@ -95,12 +105,17 @@ function generateTraits(dict) {
 
 export default function Creator() {
   const [data, setData] = useState();
+  const [useNpcClasses, setIsChecked] = useState(false);
+
+  const handleOnChange = () => {
+    setIsChecked(!useNpcClasses);
+  };
 
   function generateRandomCharacter() {
 
-    const race = "Argonian";//rand(races);
+    const race = rand(races);
     const gender = rand(genders);
-    const characterClass = rand(playerClasses);
+    const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
     setData({
       name: generateName(race, gender),
       gender: gender,
@@ -120,21 +135,33 @@ export default function Creator() {
 
   return (
     <div class="App">
-        <button onClick={generateRandomCharacter}
-          style={{
-            padding: '8px 20px',
-            marginBottom: 20,
-            backgroundColor: '#F5DEB3',
-            outline: 'rgba(0,0,0,0.5) solid 3px',
-            borderRadius: 100,
-            fontSize: 18,
-            color: 'black',
-            fontWeight: 700,
-            letterSpacing: 1.5,
-          }}
-        >
-          GENERATE NEW CHARACTER
-        </button>
+      <button onClick={generateRandomCharacter}
+        style={{
+          padding: '8px 20px',
+          marginBottom: 20,
+          backgroundColor: '#F5DEB3',
+          outline: 'rgba(0,0,0,0.5) solid 3px',
+          borderRadius: 100,
+          fontSize: 18,
+          color: 'black',
+          fontWeight: 700,
+          letterSpacing: 1.5,
+        }}
+      >
+        GENERATE NEW CHARACTER
+      </button>
+      <div style={{
+          padding: '8px 20px',
+          marginBottom: 20,
+          backgroundColor: '#F5DEB3',
+          outline: 'rgba(0,0,0,0.5) solid 3px',
+          fontSize: 18,
+          color: 'black',
+          fontWeight: 700,
+          letterSpacing: 1.5
+      }}>
+      <input type="checkbox" id="npcClasses" name="npcClasses" value="npcClasses" checked={useNpcClasses} onChange={handleOnChange}/>Use NPC Classes
+    </div>
       <br />
       {
         data &&
