@@ -151,106 +151,116 @@ export default function Creator() {
         GENERATE NEW CHARACTER
       </button>
       <div style={{
-          padding: '8px 20px',
-          marginBottom: 20,
-          backgroundColor: '#F5DEB3',
-          outline: 'rgba(0,0,0,0.5) solid 3px',
-          fontSize: 18,
-          color: 'black',
-          fontWeight: 700,
-          letterSpacing: 1.5
+        padding: '8px 20px',
+        marginBottom: 20,
+        backgroundColor: '#F5DEB3',
+        outline: 'rgba(0,0,0,0.5) solid 3px',
+        fontSize: 18,
+        color: 'black',
+        fontWeight: 700,
+        letterSpacing: 1.5,
       }}>
-      <input type="checkbox" id="npcClasses" name="npcClasses" value="npcClasses" checked={useNpcClasses} onChange={handleOnChange}/>Use NPC Classes
-    </div>
-      <br />
-      {
-        data &&
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'start',
-            justifyContent: 'center'
-          }}
-        >
+        <input type="checkbox" id="npcClasses" name="npcClasses" value="npcClasses" checked={useNpcClasses} onChange={handleOnChange} />Use NPC Classes
+      </div>
+      <div
+        style={{
+          marginLeft: 'max(calc(50% - 635px), 0px)', //TODO: Jank fix to center content on larger screens but left align on mobile (dependant on width of children)
+        }}
+      >
+        <br />
+        {
+          data &&
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'start',
-              width: '10%'
-            }}
-          >
-            <StatCard title={'name'} value={data.name} />
-            <StatCard title={'gender'} value={data.gender} />
-            <StatCard title={'race'} value={data.race} />
-            <StatCard title={'class'} value={data.characterClass} />
-            <StatCard title={'birthsign'} value={data.birthsign} />
-            <StatCard title={'vampire'} value={data.factions["Vampire Clan"] ? "Yes" : "No"} />
-            <StatCard title={'age'} value={data.age + " years old"} />
-          </div>
-          <div
-            style={{
-              width: '60%',
-            }}
-          >
-            <StatCard title={`Bio`} value={buildDescription(data)} centerText={false} />
-            <StatCard title={`Factions`} value={<div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'start',
-                justifyContent: 'center'
-              }}>
-              {
-                Object.keys(data.factions).map(function (key, i) {
-                  return <StatCard title={key} value={data.factions[key]} nested={true} />
-                })
-              }
-            </div>}
-              centerText={false} />
-            <div style={{
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'start',
-            }}>
-              <StatCard title={`Drives`} value={<div style={{
+              // justifyContent: 'center'
+            }}
+          >
+            <div
+              style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'start'
-              }}>
+                alignItems: 'start',
+                width: '170px'
+              }}
+            >
+              <StatCard title={'name'} value={data.name} />
+              <StatCard title={'gender'} value={data.gender} />
+              <StatCard title={'race'} value={data.race} />
+              <StatCard title={'class'} value={data.characterClass} />
+              <StatCard title={'birthsign'} value={data.birthsign} />
+              <StatCard title={'vampire'} value={data.factions["Vampire Clan"] ? "Yes" : "No"} />
+              <StatCard title={'age'} value={data.age + " years old"} />
+            </div>
+            <div
+              style={{
+                // width: '60%',
+                width: 1100,
+                // minWidth: 700,
+                // minWidth: 480,
+              }}
+            >
+              <StatCard title={`Bio`} value={buildDescription(data)} centerText={false} />
+              <StatCard title={`Factions`} value={<div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'start',
+                }}>
                 {
-                  Object.keys(data.drives).map(function (key, i) {
-                    return <StatCard title={key} value={data.drives[key]} nested={true} />
+                  Object.keys(data.factions).map(function (key, i) {
+                    return <StatCard title={key} value={data.factions[key]} nested={true} />
                   })
                 }
-              </div>} />
-              <StatCard title={`Ideals`} value={<div style={{
+              </div>}
+                centerText={false} />
+              <div style={{
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'start'
+                flexDirection: 'row',
+                alignItems: 'start',
+
               }}>
-                {
-                  Object.keys(data.ideals).map(function (key, i) {
-                    return <StatCard title={key} value={data.ideals[key]} nested={true} />
-                  })
-                }
-              </div>} />
-              <StatCard title={`Flaws`} value={<div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'start'
-              }}>
-                {
-                  Object.keys(data.flaws).map(function (key, i) {
-                    return <StatCard title={key} value={data.flaws[key]} nested={true} />
-                  })
-                }
-              </div>} />
+                <StatCard title={`Drives`} value={<div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'start'
+                }}>
+                  {
+                    Object.keys(data.drives).map(function (key, i) {
+                      return <StatCard title={key} value={data.drives[key]} nested={true} />
+                    })
+                  }
+                </div>} />
+                <StatCard title={`Ideals`} value={<div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'start'
+                }}>
+                  {
+                    Object.keys(data.ideals).map(function (key, i) {
+                      return <StatCard title={key} value={data.ideals[key]} nested={true} />
+                    })
+                  }
+                </div>} />
+                <StatCard title={`Flaws`} value={<div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'start'
+                }}>
+                  {
+                    Object.keys(data.flaws).map(function (key, i) {
+                      return <StatCard title={key} value={data.flaws[key]} nested={true} />
+                    })
+                  }
+                </div>} />
+              </div>
             </div>
           </div>
-        </div>
-      }
+        }
+      </div>
+
     </div>
   );
 }
@@ -260,8 +270,8 @@ function StatCard({ title, value, centerText = true, nested = false }) {
     <div
       style={{
         margin: 10,
-        padding: 20,
-        width: 'calc(100% - 60px)',
+        padding: 15,
+        width: 'calc(100% - 50px)',
         backgroundColor: nested ? '#EFE1BC' : '#F5DEB3',
         outline: 'rgba(0,0,0,0.5) solid 3px',
         borderRadius: 10,
