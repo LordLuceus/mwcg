@@ -229,9 +229,8 @@ export default function Creator() {
               <StatCard title={`Factions`} value={<div
                 style={{
                   display: 'flex',
-                  flexDirection: 'row',
+                  flexDirection: width <= 800 ? 'column' : 'row',
                   alignItems: 'start',
-                  flexWrap: 'wrap',
                 }}>
                 {
                   Object.keys(data.factions).map(function (key, i) {
