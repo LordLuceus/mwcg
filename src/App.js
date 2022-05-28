@@ -59,6 +59,8 @@ let ideals = {
   "Charitable": "You always give gold to paupers in the streets.",
   "Robin Hood": "You steal only from the richest nobles.",
   "Abolitionist": "All slaves you come across must be freed, and their owners killed.",
+  "Dishonest": "You never buy anything, if you want something you steal it.",
+  "Religious": "You are a devout follower of a religion, you always leave offerings at temple shrines.",
 };
 let flaws = {
   "Hydrophobic": "You cannot swim or otherwise enter water, water walking is a must.",
@@ -69,7 +71,9 @@ let flaws = {
   "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
   "Sugartooth": "Once per day you must consume at least one skooma or moon sugar, and you must be in possession of a skooma pipe at all times.",
   "Prejudiced": "You can only trade with NPCs of your own race.",
-  "Snooty": "You won't talk to anyone wearing common clothing or basic armour (iron, leather)."
+  "Snooty": "You won't talk to anyone wearing common clothing or basic armour (iron, leather).",
+  "Outlaw": "Begin the game with a 500 gold bounty. (SetPCCrimeLevel 500)",
+  "High Standards": "You refuse to rest anywhere that isn't a comfy bed",
 };
 
 let classSpecificTraits = {
@@ -158,6 +162,10 @@ function generateTraits(characterClass, dict, addClassSpecific = false) {
 
   if (characterClass == "Thief" || characterClass == "Rogue") {
     delete traits["Honest"];
+  }
+
+  if (traits["Honest"] && traits["Dishonest"]) {
+    Math.random() > 0.5 ? delete traits["Honest"] : delete traits["Dishonest"];
   }
 
   if (addClassSpecific) {
