@@ -102,13 +102,13 @@ function buildDescription(data) {
   </div>
 }
 
-function generateFactions(characterClass) { //TODO Take class into account
+function generateFactions(isVampire) { //TODO Take class into account
   let factions = {};
   if (Math.random() > 0.2) factions["Imperial Faction"] = rand(imperialFactions);
   if (Math.random() > 0.7) factions["Native Faction"] = rand(morrowindFactions);
   if (Math.random() > 0.2) factions["Religious Faction"] = rand(religiousFactions);
   if (Math.random() > 0.2) factions["Great House"] = rand(greatHouses);
-  if (Math.random() > 0.85) factions["Vampire Clan"] = rand(vampireClans);
+  if (isVampire) factions["Vampire Clan"] = rand(vampireClans);
   return factions;
 }
 
@@ -139,6 +139,11 @@ export default function Creator() {
     const race = rand(races);
     const gender = rand(genders);
     const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
+
+    const isNereverine = Math.random() > 0.5;
+    const isVampire = Math.random() > 0.85;
+    const isWerewolf = !isVampire && Math.random() > 0.95;
+
     setData({
       name: generateName(race, gender),
       gender: gender,
@@ -148,7 +153,11 @@ export default function Creator() {
       birthsign: rand(birthsigns),
 
       age: generateAge(race),
-      factions: generateFactions(characterClass),
+      factions: generateFactions(isVampire),
+
+      isNereverine: isNereverine,
+      isVampire: isVampire,
+      isWerewolf: isWerewolf,
 
       drives: generateTraits(drives),
       ideals: generateTraits(ideals),
@@ -182,12 +191,16 @@ export default function Creator() {
         color: 'black',
         fontWeight: 700,
         letterSpacing: 1.5,
+        marginLeft: 'max(calc(50% - 635px), 0px)', 
+        marginRight: 'max(calc(50% - 635px), 0px)',
       }}>
         <input type="checkbox" id="npcClasses" name="npcClasses" value="npcClasses" checked={useNpcClasses} onChange={handleOnChange} />Use NPC Classes
       </div>
       <div
         style={{
-          marginLeft: 'max(calc(50% - 635px), 0px)', //TODO: Jank fix to center content on larger screens but left align on mobile (dependant on width of children)
+           //TODO: Jank fix to center content on larger screens but left align on mobile (dependant on width of children)
+          marginLeft: 'max(calc(50% - 635px), 0px)', 
+          marginRight: 'max(calc(50% - 635px), 0px)',
         }}
       >
         <br />
@@ -196,17 +209,18 @@ export default function Creator() {
           <div
             style={{
               display: 'flex',
-              flexDirection: 'row',
+              flexDirection:  width <= 800 ? 'row' : 'column',
               alignItems: 'start',
-              // justifyContent: 'center'
+              justifyContent: 'center',
             }}
           >
             <div
               style={{
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection:  width <= 800 ? 'column' : 'row',
                 alignItems: 'start',
-                width: '170px'
+                width:  width <= 800 ? '170px' : '100%',
+                alignItems: 'stretch'
               }}
             >
               <StatCard title={'name'} value={data.name} />
@@ -214,13 +228,18 @@ export default function Creator() {
               <StatCard title={'race'} value={data.race} />
               <StatCard title={'class'} value={data.characterClass} />
               <StatCard title={'birthsign'} value={data.birthsign} />
-              <StatCard title={'vampire'} value={data.factions["Vampire Clan"] ? "Yes" : "No"} />
-              <StatCard title={'age'} value={data.age} />
+              <StatCard title={'nereverine'} value={data.isNereverine ? "Yes" : "No"} />
+              <StatCard title={'occult'} value={data.isVampire
+                ? data.factions["Vampire Clan"].replace("Clan", "Vampire")
+                : data.isWerewolf
+                  ? "Werewolf"
+                  : "None"
+              }/>
             </div>
             <div
               style={{
                 // width: '60%',
-                width: 1100,
+                width: '100%',
                 // minWidth: 700,
                 // minWidth: 480,
               }}
