@@ -1,6 +1,28 @@
-import React, { useState } from 'react';
-import { generateName } from './NameGenerator'
-//import ReactTooltip from 'react-tooltip';
+import React, { useState, useEffect } from 'react';
+import { generateName } from './NameGenerator';
+
+function getWindowDimensions() {
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height
+  };
+}
+
+function useWindowDimensions() {
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowDimensions;
+}
 
 const currentYear = 427;
 
@@ -106,6 +128,7 @@ function generateTraits(dict) {
 export default function Creator() {
   const [data, setData] = useState();
   const [useNpcClasses, setIsChecked] = useState(false);
+  const { height, width } = useWindowDimensions();
 
   const handleOnChange = () => {
     setIsChecked(!useNpcClasses);
@@ -192,7 +215,7 @@ export default function Creator() {
               <StatCard title={'class'} value={data.characterClass} />
               <StatCard title={'birthsign'} value={data.birthsign} />
               <StatCard title={'vampire'} value={data.factions["Vampire Clan"] ? "Yes" : "No"} />
-              <StatCard title={'age'} value={data.age + " years old"} />
+              <StatCard title={'age'} value={data.age} />
             </div>
             <div
               style={{
@@ -208,6 +231,7 @@ export default function Creator() {
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'start',
+                  flexWrap: 'wrap',
                 }}>
                 {
                   Object.keys(data.factions).map(function (key, i) {
@@ -218,7 +242,7 @@ export default function Creator() {
                 centerText={false} />
               <div style={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: width <= 800 ? 'column' : 'row',
                 alignItems: 'start',
 
               }}>
