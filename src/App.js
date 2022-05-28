@@ -187,7 +187,7 @@ export default function Creator() {
     const gender = rand(genders);
     const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
 
-    const isNereverine = Math.random() > 0.5;
+    const isNerevarine = Math.random() > 0.5;
     const isVampire = Math.random() > 0.85;
     const isWerewolf = !isVampire && Math.random() > 0.95;
 
@@ -202,7 +202,7 @@ export default function Creator() {
       age: generateAge(race),
       factions: generateFactions(characterClass, isVampire, buildSensibleCharacters),
 
-      isNereverine: isNereverine,
+      isNerevarine: isNerevarine,
       isVampire: isVampire,
       isWerewolf: isWerewolf,
 
@@ -295,7 +295,7 @@ export default function Creator() {
               <StatCard title={'race'} value={data.race} />
               <StatCard title={'class'} value={data.characterClass} />
               <StatCard title={'birthsign'} value={data.birthsign} />
-              <StatCard title={'nereverine'} value={data.isNereverine ? "Yes" : "No"} />
+              <StatCard title={'nerevarine'} value={data.isNerevarine ? "Yes" : "No"} />
               <StatCard title={'occult'} value={data.isVampire
                 ? "Vampire"
                 : data.isWerewolf
