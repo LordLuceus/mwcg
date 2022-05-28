@@ -74,13 +74,13 @@ let flaws = {
 
 let classSpecificTraits = {
   "Dreamer": {"Dreamer": "You are a dreamer, strip naked and wield a chitin club. Purge the outlander n'wah from the land."},
-  "Trader": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
-  "Merchant": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
-  "Caravaner": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
-  "Bookseller": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
+  "Trader": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
+  "Merchant": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
+  "Caravaner": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
+  "Bookseller": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
   "Buoyant Armiger": {"Buoyant Armiger": "You're a Buoyant Armiger, acquire a full set of glass armour then charge straight into Ghostgate, kill everything within."},
-  "Ordinator": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land"},
-  "Ordinator Guard": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land"},
+  "Ordinator": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land."},
+  "Ordinator Guard": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land."},
   "Slave": {"Ex-Slave": "Seek out and complete the Twin Lamps quests."},
 }
 
