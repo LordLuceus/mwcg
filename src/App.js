@@ -50,7 +50,8 @@ let drives = {
   "Hobbyist": "You dabble in a side skill, train one of your miscellanious skills to 100.",
   "Imperialist": "Complete the Imperial Cult or Legion questlines, even if they are not in your factions list.",
   "Daedrologist": "Complete at least one daedric quest and gain the prince's artefact.",
-  "Sixth House Cultist": "You wish to explore every sixth house shrine you find and leave ash statues everywhere you visit."
+  "Sixth House Cultist": "You wish to explore every sixth house shrine you find and leave ash statues everywhere you visit.",
+  "Dwemer Scholar": "You are obsessed with the Dwemer, explore every Dwemer ruin and only use Dwemer equipment",
 };
 let ideals = {
   "Honest": "You never steal, and you never haggle a merchant below their initial price.",
@@ -64,7 +65,7 @@ let flaws = {
   "Kleptomaniac": "You must steal at least one thing per day.",
   "Stubborn": "If caught committing a crime, you will always resist arrest.",
   "Sentimental": "You never sell your old weapons and armour, but instead display them in your home base.",
-  "Bloodlust": "You must kill an innocent every time you visit a settlement, once per day.",
+  "Bloodlust": "You must kill an innocent every time you visit a settlement, max once per day.",
   "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
   "Sugartooth": "Once per day you must consume at least one skooma or moon sugar, and you must be in possession of a skooma pipe at all times.",
   "Prejudiced": "You can only trade with NPCs of your own race.",
@@ -77,9 +78,9 @@ let classSpecificTraits = {
   "Merchant": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
   "Caravaner": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
   "Bookseller": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next"},
-  "Buoyant Armiger": {"Buoyant Armiger": "You're a Buoyant Armiger, give yourself a full set of glass armour and charge straight into Ghostgate, kill everything within."},
-  "Ordinator": {"Ordinator": "You're an Ordinator, give yourself a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land"},
-  "Ordinator Guard": {"Ordinator": "You're an Ordinator, give yourself a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land"},
+  "Buoyant Armiger": {"Buoyant Armiger": "You're a Buoyant Armiger, acquire a full set of glass armour then charge straight into Ghostgate, kill everything within."},
+  "Ordinator": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land"},
+  "Ordinator Guard": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land"},
   "Slave": {"Ex-Slave": "Seek out and complete the Twin Lamps quests."},
 }
 
