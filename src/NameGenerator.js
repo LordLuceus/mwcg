@@ -58,7 +58,10 @@ export function generateName(race, gender) {
                         return rand(argonianMaleNames) + "-" + rand(argonianMaleNames) + "-" + rand(argonianMaleNames);
                     }
                 }
-                return rand(argonianTamrielicStarts) + "-" + rand(argonianMaleTamrielicMiddles) + "-" + rand(argonianTamrielicEnds);
+                if (Math.random() > 0.5) {
+                    return rand(argonianTamrielicStarts) + "-" + rand(argonianMaleTamrielicMiddles) + "-" + rand(argonianTamrielicEnds);
+                }
+                return rand(argonianTamrielicStarts) + "-" + rand(argonianTamrielicEnds);
             } else {
                 if (Math.random() > 0.5) {
                     let x = Math.random();
@@ -70,7 +73,10 @@ export function generateName(race, gender) {
                         return rand(argonianFemaleNames) + "-" + rand(argonianFemaleNames) + "-" + rand(argonianFemaleNames);
                     }
                 }
-                return rand(argonianTamrielicStarts) + "-" + rand(argonianFemaleTamrielicMiddles) + "-" + rand(argonianTamrielicEnds);
+                if (Math.random() > 0.5) {
+                    return rand(argonianTamrielicStarts) + "-" + rand(argonianFemaleTamrielicMiddles) + "-" + rand(argonianTamrielicEnds);
+                }
+                return rand(argonianTamrielicStarts) + "-" + rand(argonianTamrielicEnds);
             }
         case "Breton":
             if (gender === "Male") {

@@ -191,7 +191,7 @@ export default function Creator() {
 
   function generateRandomCharacter() {
 
-    const race = rand(races);
+    const race = "Argonian";//rand(races);
     const gender = rand(genders);
     const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
 
