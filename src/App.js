@@ -185,7 +185,7 @@ export default function Creator() {
 
     const race = rand(races);
     const gender = rand(genders);
-    const characterClass = "Buoyant Armiger";//useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
+    const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
 
     const isNereverine = Math.random() > 0.5;
     const isVampire = Math.random() > 0.85;
