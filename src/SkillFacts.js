@@ -215,6 +215,11 @@ const classDetails = {
         "Attributes": ["Strength", "Endurance"],
         "Major Skills": ["Block", "Blunt Weapon", "Axe", "Unarmored", "Light Armor"],
     },
+    "Necromancer": {
+        "Specialisation": "Magic",
+        "Attributes": ["Intelligence", "Willpower"],
+        "Major Skills": ["Conjuration", "Destruction", "Illusion", "Mysticism", "Enchant"],
+    },
     "Noble": {
         "Specialisation": "Combat",
         "Attributes": ["Personality", "Luck"],
