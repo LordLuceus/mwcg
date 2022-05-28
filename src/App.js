@@ -200,7 +200,7 @@ export default function Creator() {
     const isWerewolf = !isVampire && Math.random() > 0.95;
 
     setData({
-      name: generateName(race, gender),
+      name: generateName(race, gender, characterClass),
       gender: gender,
       characterClass: characterClass,
       race: race,
