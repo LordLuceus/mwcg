@@ -61,6 +61,7 @@ let ideals = {
   "Abolitionist": "All slaves you come across must be freed, and their owners killed.",
   "Dishonest": "You never buy anything, if you want something you steal it.",
   "Religious": "You are a devout follower of a religion, you always leave offerings at temple shrines.",
+  "Pacifist": "You never start a fight, and only attack if your life is threatened."
 };
 let flaws = {
   "Hydrophobic": "You cannot swim or otherwise enter water, water walking is a must.",
@@ -77,15 +78,15 @@ let flaws = {
 };
 
 let classSpecificTraits = {
-  "Dreamer": {"Dreamer": "You are a dreamer, strip naked and wield a chitin club. Purge the outlander n'wah from the land."},
-  "Trader": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
-  "Merchant": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
-  "Caravaner": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
-  "Bookseller": {"Pack Merchant": "Buy goods in town and sell them for a profit in the next."},
-  "Buoyant Armiger": {"Buoyant Armiger": "You're a Buoyant Armiger, acquire a full set of glass armour then charge straight into Ghostgate, kill everything within."},
-  "Ordinator": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land."},
-  "Ordinator Guard": {"Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land."},
-  "Slave": {"Ex-Slave": "Seek out and complete the Twin Lamps quests."},
+  "Dreamer": { "Dreamer": "You are a dreamer, strip naked and wield a chitin club. Purge the outlander n'wah from the land." },
+  "Trader": { "Pack Merchant": "Acquire goods in town and sell them for a profit in the next." },
+  "Merchant": { "Pack Merchant": "Acquire goods in town and sell them for a profit in the next." },
+  "Caravaner": { "Pack Merchant": "Acquire goods in town and sell them for a profit in the next." },
+  "Bookseller": { "Pack Merchant": "Acquire goods in town and sell them for a profit in the next." },
+  "Buoyant Armiger": { "Buoyant Armiger": "You're a Buoyant Armiger, acquire a full set of glass armour then charge straight into Ghostgate, kill everything within." },
+  "Ordinator": { "Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land." },
+  "Ordinator Guard": { "Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land." },
+  "Slave": { "Ex-Slave": "Seek out and complete the Twin Lamps quests." },
 }
 
 let maxLifespan = { "Argonian": 80, "Breton": 120, "Dark Elf": 400, "High Elf": 400, "Imperial": 80, "Khajiit": 80, "Nord": 80, "Orc": 80, "Redguard": 80, "Wood Elf": 400 };
@@ -150,6 +151,28 @@ function generateFactions(characterClass, isVampire, buildSensibleCharacters) {
   return factions;
 }
 
+//Not the cleanest way since will have to add all mutally exclusive combos but for now it's manageable
+function removeMutallyExclusiveTraits(drives, ideals, flaws, characterClass) {
+
+  if (characterClass == "Thief" || characterClass == "Rogue") {
+    delete ideals["Honest"];
+  }
+
+  if (ideals["Honest"] && flaws["Kleptomaniac"]) {
+    Math.random() > 0.5 ? delete ideals["Honest"] : delete flaws["Kleptomaniac"];
+  }
+
+  if (ideals["Honest"] && ideals["Dishonest"]) {
+    Math.random() > 0.5 ? delete ideals["Honest"] : delete ideals["Dishonest"];
+  }
+
+  if (ideals["Pacifist"] && flaws["Bloodlust"]) {
+    Math.random() > 0.5 ? delete ideals["Pacifist"] : delete flaws["Bloodlust"];
+  }
+
+  return [drives, ideals, flaws];
+}
+
 function generateTraits(characterClass, dict, addClassSpecific = false) {
   let traits = {};
   let count = Math.random() > 0.65 ? 2 : 1;
@@ -160,16 +183,8 @@ function generateTraits(characterClass, dict, addClassSpecific = false) {
     traits[key] = trait;
   }
 
-  if (characterClass == "Thief" || characterClass == "Rogue") {
-    delete traits["Honest"];
-  }
-
-  if (traits["Honest"] && traits["Dishonest"]) {
-    Math.random() > 0.5 ? delete traits["Honest"] : delete traits["Dishonest"];
-  }
-
   if (addClassSpecific) {
-    traits = Object.assign({},classSpecificTraits[characterClass],  traits);
+    traits = Object.assign({}, classSpecificTraits[characterClass], traits);
   }
 
   return traits;
@@ -199,6 +214,16 @@ export default function Creator() {
     const isVampire = Math.random() > 0.85;
     const isWerewolf = !isVampire && Math.random() > 0.95;
 
+    let characterDrives = generateTraits(characterClass, drives, true);
+    let characterIdeals = generateTraits(characterClass, ideals);
+    let characterFlaws = generateTraits(characterClass, flaws);
+
+    //No idea if js is pbv or pbr so this should do the trick
+    let sanitised = removeMutallyExclusiveTraits(characterDrives, characterIdeals, characterFlaws, characterClass);
+    characterDrives = sanitised[0];
+    characterIdeals = sanitised[1];
+    characterFlaws = sanitised[2];
+
     setData({
       name: generateName(race, gender, characterClass),
       gender: gender,
@@ -214,9 +239,9 @@ export default function Creator() {
       isVampire: isVampire,
       isWerewolf: isWerewolf,
 
-      drives: generateTraits(characterClass, drives, true),
-      ideals: generateTraits(characterClass, ideals),
-      flaws: generateTraits(characterClass, flaws),
+      drives: characterDrives,
+      ideals: characterIdeals,
+      flaws: characterFlaws,
     });
   }
 

@@ -260,7 +260,7 @@ const classDetails = {
         "Attributes": ["Intelligence", "Personality"],
         "Major Skills": ["Speechcraft", "Mercantile", "Alchemy", "Unarmored", "Athletics"],
     },
-    "Scout": {
+    "Sharpshooter": {
         "Specialisation": "Combat",
         "Attributes": ["Agility", "Intelligence"],
         "Major Skills": ["Marksman", "Medium Armor", "Destruction", "Enchant", "Sneak"],
