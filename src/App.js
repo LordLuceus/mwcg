@@ -61,7 +61,6 @@ let ideals = {
   "Abolitionist": "All slaves you come across must be freed, and their owners killed.",
   "Dishonest": "You never buy anything, if you want something you steal it.",
   "Religious": "You are a devout follower of a religion, you always leave offerings at temple shrines.",
-  "Pacifist": "You never start a fight, and only attack if your life is threatened."
 };
 let flaws = {
   "Hydrophobic": "You cannot swim or otherwise enter water, water walking is a must.",
@@ -72,9 +71,7 @@ let flaws = {
   "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
   "Sugartooth": "Once per day you must consume at least one skooma or moon sugar, and you must be in possession of a skooma pipe at all times.",
   "Prejudiced": "You can only trade with NPCs of your own race.",
-  "Snooty": "You won't talk to anyone wearing common clothing or basic armour (iron, leather).",
   "Outlaw": "Begin the game with a 500 gold bounty. (SetPCCrimeLevel 500)",
-  "High Standards": "You refuse to rest anywhere that isn't a comfy bed",
 };
 
 let classSpecificTraits = {
@@ -87,6 +84,17 @@ let classSpecificTraits = {
   "Ordinator": { "Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land." },
   "Ordinator Guard": { "Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land." },
   "Slave": { "Ex-Slave": "Seek out and complete the Twin Lamps quests." },
+}
+
+let backgroundSpecificTraits = {
+  "A Noble": {
+    "Snooty": "You won't talk to anyone wearing common clothing or basic armour (iron, leather).",
+    "High Standards": "You refuse to rest anywhere that isn't a comfy bed",
+  },
+  "Royalty": {
+    "Snooty": "You won't talk to anyone wearing common clothing or basic armour (iron, leather).",
+    "High Standards": "You refuse to rest anywhere that isn't a comfy bed",
+  }
 }
 
 let maxLifespan = { "Argonian": 80, "Breton": 120, "Dark Elf": 400, "High Elf": 400, "Imperial": 80, "Khajiit": 80, "Nord": 80, "Orc": 80, "Redguard": 80, "Wood Elf": 400 };
@@ -120,7 +128,7 @@ function buildDescription(data) {
 
   return <div>
     You are {data.name}, a {data.gender.toLowerCase()} {data.race} {data.characterClass.toLowerCase()}.
-    You were born under the sign of The {data.birthsign} in the year 3E{currentYear - data.age}.
+    You were born under the sign of The {data.birthsign} in the year 3E{currentYear - data.age}, making you {data.age} years old at the start of the game.
     You were {data.lifestyle.toLowerCase()} before being arrested and sent to Vvardenfell, and as a result {generateAim(data.lifestyle)}.
 
 
@@ -173,7 +181,7 @@ function removeMutallyExclusiveTraits(drives, ideals, flaws, characterClass) {
   return [drives, ideals, flaws];
 }
 
-function generateTraits(characterClass, dict, addClassSpecific = false) {
+function generateTraits(characterClass, dict, addClassSpecific = false, addBackgroundSpecific = false, background = null) {
   let traits = {};
   let count = Math.random() > 0.65 ? 2 : 1;
 
@@ -185,6 +193,14 @@ function generateTraits(characterClass, dict, addClassSpecific = false) {
 
   if (addClassSpecific) {
     traits = Object.assign({}, classSpecificTraits[characterClass], traits);
+  }
+  
+  if (addBackgroundSpecific && backgroundSpecificTraits[background] && Math.random() > 0.5) {
+    let k = rand(Object.keys(backgroundSpecificTraits[background]));
+    let v = backgroundSpecificTraits[background][k];
+    var obj = {};
+    obj[k] = v;
+    traits = Object.assign({}, obj, traits);
   }
 
   return traits;
@@ -209,6 +225,7 @@ export default function Creator() {
     const race = rand(races);
     const gender = rand(genders);
     const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
+    const lifestyle = rand(lifestyles);
 
     const isNerevarine = Math.random() > 0.5;
     const isVampire = Math.random() > 0.85;
@@ -216,7 +233,7 @@ export default function Creator() {
 
     let characterDrives = generateTraits(characterClass, drives, true);
     let characterIdeals = generateTraits(characterClass, ideals);
-    let characterFlaws = generateTraits(characterClass, flaws);
+    let characterFlaws = generateTraits(characterClass, flaws, false, true, lifestyle);
 
     //No idea if js is pbv or pbr so this should do the trick
     let sanitised = removeMutallyExclusiveTraits(characterDrives, characterIdeals, characterFlaws, characterClass);
@@ -229,7 +246,7 @@ export default function Creator() {
       gender: gender,
       characterClass: characterClass,
       race: race,
-      lifestyle: rand(lifestyles),
+      lifestyle: lifestyle,
       birthsign: rand(birthsigns),
 
       age: generateAge(race),
