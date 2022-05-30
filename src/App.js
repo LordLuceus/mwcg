@@ -61,6 +61,7 @@ let ideals = {
   "Abolitionist": "All slaves you come across must be freed, and their owners killed.",
   "Dishonest": "You never buy anything, if you want something you steal it.",
   "Religious": "You are a devout follower of a religion, you always leave offerings at temple shrines.",
+  "Pacifist": "You never start a fight, and only attack if your life is threatened."
 };
 let flaws = {
   "Hydrophobic": "You cannot swim or otherwise enter water, water walking is a must.",
