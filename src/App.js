@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { generateName } from './NameGenerator';
 import { getBestFactionFit } from './SkillFacts'
+import { generateBackstory } from './Backgrounds'
+import { rand, map } from './Utils'
 import ReactTooltip from 'react-tooltip';
 
 function getWindowDimensions() {
@@ -26,11 +28,23 @@ function useWindowDimensions() {
   return windowDimensions;
 }
 
+function getIndefiniteArticle(word) {
+  word = word.toLowerCase();
+  if (word[0] == 'a' ||
+    word[0] == 'e' ||
+    word[0] == 'i' ||
+    word[0] == 'o' ||
+    word[0] == 'u') {
+    return "an";
+  }
+  return "a";
+}
+
 const currentYear = 427;
 
 let genders = ["Female", "Male"];
 let playerClasses = ["Acrobat", "Agent", "Archer", "Assassin", "Barbarian", "Bard", "Battlemage", "Crusader", "Healer", "Knight", "Mage", "Monk", "Nightblade", "Pilgrim", "Rogue", "Scout", "Sorcerer", "Spellsword", "Thief", "Warrior", "Witchhunter"];
-let npcClasses = ["Alchemist", "Apothecary", "Bookseller", "Buoyant Armiger", "Caravaner", "Champion", "Clothier", "Commoner", "Dreamer", "Drillmaster", "Enchanter", "Enforcer", "Farmer", "Gondolier", "Guard", "Guild Guide", "Herder", "Hunter", "Mabrigash", "Merchant", "Miner", "Necromancer", "Noble", "Ordinator", "Ordinator Guard", "Pauper", "Pawnbroker", "Priest", "Publican", "Savant", "Sharpshooter", "Shipmaster", "Slave", "Smith", "Smuggler", "Trader", "Warlock", "Wise Woman", "Witch"];
+let npcClasses = ["Alchemist", "Apothecary", "Bookseller", "Buoyant Armiger", "Caravaner", "Champion", "Clothier", "Commoner", "Dreamer", "Drillmaster", "Enchanter", "Enforcer", "Farmer", "Gondolier", "Guard", "Guild Guide", "Herder", "Hunter", "Mabrigash", "Merchant", "Miner", "Necromancer", "Noble", "Ordinator", "Ordinator Guard", "Pauper", "Pawnbroker", "Priest", "Publican", "Savant", "Sharpshooter", "Shipmaster", "Smith", "Smuggler", "Trader", "Warlock", "Wise Woman", "Witch"];
 let races = ["Argonian", "Breton", "Dark Elf", "High Elf", "Imperial", "Khajiit", "Nord", "Orc", "Redguard", "Wood Elf"]
 let lifestyles = ["Royalty", "A Noble", "Well Off", "Poor", "Destitute"]
 let birthsigns = ["Warrior", "Mage", "Thief", "Serpent", "Lady", "Steed", "Lord", "Apprentice", "Atronach", "Ritual", "Lover", "Shadow", "Tower"]
@@ -68,7 +82,8 @@ let flaws = {
   "Kleptomaniac": "You must steal at least one thing per day.",
   "Stubborn": "If caught committing a crime, you will always resist arrest.",
   "Sentimental": "You never sell your old weapons and armour, but instead display them in your home base.",
-  "Bloodlust": "You must kill an innocent every time you visit a settlement, max once per day.",
+  "Bloodlust": "You must kill at least one living thing per day.",
+  "Psycopath": "You must kill an innocent every time you visit a settlement, max once per day.",
   "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
   "Sugartooth": "Once per day you must consume at least one skooma or moon sugar, and you must be in possession of a skooma pipe at all times.",
   "Prejudiced": "You can only trade with NPCs of your own race.",
@@ -76,6 +91,7 @@ let flaws = {
 };
 
 let classSpecificTraits = {
+  "Witchhunter": { "Exorcist": "You desire to rid the land of the supernatural by hunting down all ghosts, vampires, and lycanthropes." },
   "Dreamer": { "Dreamer": "You are a dreamer, strip naked and wield a chitin club. Purge the outlander n'wah from the land." },
   "Trader": { "Pack Merchant": "Acquire goods in town and sell them for a profit in the next." },
   "Merchant": { "Pack Merchant": "Acquire goods in town and sell them for a profit in the next." },
@@ -84,7 +100,6 @@ let classSpecificTraits = {
   "Buoyant Armiger": { "Buoyant Armiger": "You're a Buoyant Armiger, acquire a full set of glass armour then charge straight into Ghostgate, kill everything within." },
   "Ordinator": { "Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land." },
   "Ordinator Guard": { "Ordinator": "You're an Ordinator, acquire a set of Indoril Armor, Expensive Pants, and an Ebony Mace and purge the lawless scum from the land." },
-  "Slave": { "Ex-Slave": "Seek out and complete the Twin Lamps quests." },
 }
 
 let backgroundSpecificTraits = {
@@ -100,38 +115,40 @@ let backgroundSpecificTraits = {
 
 let maxLifespan = { "Argonian": 80, "Breton": 120, "Dark Elf": 400, "High Elf": 400, "Imperial": 80, "Khajiit": 80, "Nord": 80, "Orc": 80, "Redguard": 80, "Wood Elf": 400 };
 
-function rand(array) {
-  return array[Math.floor(Math.random() * array.length)]
-}
-
-function map(min, max, newMin, newMax, value) {
-  return newMin + (value - min) * (newMax - newMin) / (max - min);
+const hometowns = {
+  "Argonian": ["Archon", "Blackrose", "Gideon", "Helstrom", "Lilmoth", "Soulrest", "Stormhold", "Thorn"],
+  "Breton": ["Daggerfall", "Camlorn", "Shornhelm", "Wayrest", "Northpoint", "Evermore", "Jehanna", "Farrun"],
+  "Dark Elf": ["Blacklight", "Narsis", "Tear", "Mournhold", "Necrom", "Cheydinhal"],
+  "High Elf": ["Lillandril", "Cloudrest", "Shimmerene", "Firsthold", "Skywatch", "Alinor", "Sunhold", "Dusk"],
+  "Imperial": ["Anvil", "Chorrol", "Bruma", "Cheydinhal", "The Imperial City", "Leyawiin", "Bravil", "Skingrad", "Kvatch"],
+  "Khajiit": ["Riverhold", "Dune", "Rimmen", "Orcrest", "Corinthe", "Torval", "Senchal"],
+  "Nord": ["Solitude", "Morthal", "Winterhold", "Dawnstar", "Markarth", "Riften", "Whiterun", "Windhelm", "Bruma"],
+  "Orc": ["an Orcish stronghold", "Orsinium"],
+  "Redguard": ["Hegathe", "Sentinel", "Skaven", "Dragonstar", "Elinhir", "Taneth", "Rihad", "Gilane", "Hew's Bane", "Stros M'Kai"],
+  "Wood Elf": ["Arenthia", "Falinesti", "Silvenar", "Woodhearth", "Greenheart", "Elden Root", "Southpoint", "Haven"],
 }
 
 function generateAge(race) {
-  return Math.floor(map(0, 1, maxLifespan[race] * 0.25, maxLifespan[race], Math.random()))
+  let x = Math.random();
+  return Math.floor(map(0, 1, maxLifespan[race] * 0.25, maxLifespan[race] * 0.9, x * x))
 }
 
-function generateAim(lifestyle) {
-  switch (lifestyle) {
-    case "Royalty":
-    case "A Noble":
-      return "you yearn to regain your former wealth and clear your name";
-    case "Well Off":
-      return "you hope to carve out a decent life in this new land"
-    case "Poor":
-    case "Destitute":
-      return "you pray that this new land will treat you more kindly than your last"
+function describeParents(parents) {
+  if (!parents.knewParents) {
+    return "You never knew who your parents were.";
   }
+  let text = ` Your father was ${parents.father}, ${getIndefiniteArticle(parents.fatherClass)} ${parents.fatherClass}; and your mother was ${parents.mother}, ${getIndefiniteArticle(parents.motherClass)} ${parents.motherClass}.`;
+  return text;
 }
 
 function buildDescription(data) {
 
   return <div>
     You are {data.name}, a {data.gender.toLowerCase()} {data.race} {data.characterClass.toLowerCase()}.
-    You were born under the sign of The {data.birthsign} in the year 3E{currentYear - data.age}, making you {data.age} years old at the start of the game.
-    You were {data.lifestyle.toLowerCase()} before being arrested and sent to Vvardenfell, and as a result {generateAim(data.lifestyle)}.
-
+    You were born in {data.hometown} under the sign of The {data.birthsign} in the year 3E{currentYear - data.age}, making you {data.age} years old at the start of the game.
+    You were {data.lifestyle.toLowerCase()} before being arrested and sent to Vvardenfell.
+    <br /><br />
+    {describeParents(data.parents)} {data.familyAndFriends} {data.lifeEvents}
 
   </div>
 }
@@ -179,6 +196,10 @@ function removeMutallyExclusiveTraits(drives, ideals, flaws, characterClass) {
     Math.random() > 0.5 ? delete ideals["Pacifist"] : delete flaws["Bloodlust"];
   }
 
+  if (ideals["Pacifist"] && flaws["Psychopath"]) {
+    Math.random() > 0.5 ? delete ideals["Pacifist"] : delete flaws["Psychopath"];
+  }
+
   return [drives, ideals, flaws];
 }
 
@@ -195,7 +216,7 @@ function generateTraits(characterClass, dict, addClassSpecific = false, addBackg
   if (addClassSpecific) {
     traits = Object.assign({}, classSpecificTraits[characterClass], traits);
   }
-  
+
   if (addBackgroundSpecific && backgroundSpecificTraits[background] && Math.random() > 0.5) {
     let k = rand(Object.keys(backgroundSpecificTraits[background]));
     let v = backgroundSpecificTraits[background][k];
@@ -221,20 +242,108 @@ export default function Creator() {
     setSensibleCharsChecked(!buildSensibleCharacters);
   };
 
+  function generateParents(knewParents, race, name) {
+    let guardianRace = rand(races);
+    let guardianGender = rand(genders);
+    let guardian = generateName(guardianRace, guardianGender);
+    let guardianClass = rand(npcClasses.concat(playerClasses));
+
+    if (!knewParents) {
+      return {
+        knewParents: false,
+        guardian: guardian,
+        guardianGender: guardianGender,
+        guardianRace: guardianRace,
+        guardianClass: guardianClass,
+      };
+    }
+
+    let father = generateName(race, "Male");
+    let mother = generateName(race, "Female");
+
+    if (race === "Imperial" || race === "Dark Elf" || race === "Breton") {
+      let surname = name.split(" ")[1];
+
+      father = father.split(" ")[0] + " " + surname;
+      mother = mother.split(" ")[0] + " " + surname;
+    }
+    if (race === "Orc") {
+      let surname = name.split(" ")[1];
+      let clanName = surname.split("-")[1];
+
+      father = father.split(" ")[0] + " Gro-" + clanName;
+      mother = mother.split(" ")[0] + " Gra-" + clanName;
+    }
+
+    let fatherClass = rand(npcClasses.concat(playerClasses));
+    let motherClass = rand(npcClasses.concat(playerClasses));
+
+    if (race != "Dark Elf") {
+      while (fatherClass === "Dreamer" || fatherClass === "Ordinator" || fatherClass === "Ordinator Guard" || fatherClass === "Wise Woman" || fatherClass === "Mabrigash") {
+        console.log("Rerolled father class cos it was " + fatherClass);
+        fatherClass = rand(npcClasses.concat(playerClasses));
+      }
+      while (motherClass === "Dreamer" || motherClass === "Ordinator" || motherClass === "Ordinator Guard" || motherClass === "Wise Woman" || motherClass === "Mabrigash") {
+        console.log("Rerolled mother class cos it was " + motherClass);
+        motherClass = rand(npcClasses.concat(playerClasses));
+      }
+    }
+
+    return {
+      knewParents: true,
+      father: father,
+      fatherClass: fatherClass,
+      mother: mother,
+      motherClass: motherClass,
+      guardian: guardian,
+      guardianGender: guardianGender,
+      guardianRace: guardianRace,
+      guardianClass: guardianClass,
+    };
+  }
+
+  function familyAndFriends(playerClass, parents, lifestyle) {
+    if (!parents.knewParents) {
+      switch (lifestyle) {
+        case "Destitute":
+        case "Poor":
+          return Math.random() > 0.5 ? `Having nowhere to go, you were raised in the streets, looked after by ${parents.guardian}, a ${parents.guardianGender} ${parents.guardianRace} ${playerClass} from whom you learnt everything you know.`
+            : "You were raised in an orphanage in the city.";
+        case "Well Off": return "You were raised in an orphanage in the city.";
+      };
+    }
+  }
+
   function generateRandomCharacter() {
 
     const race = rand(races);
     const gender = rand(genders);
     const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
+
+    const name = generateName(race, gender, characterClass);
+
+    const age = generateAge(race);
+
     const lifestyle = rand(lifestyles);
 
     const isNerevarine = Math.random() > 0.5;
-    const isVampire = Math.random() > 0.85;
+    const isVampire = Math.random() > 0.95;
     const isWerewolf = !isVampire && Math.random() > 0.95;
 
     let characterDrives = generateTraits(characterClass, drives, true);
     let characterIdeals = generateTraits(characterClass, ideals);
     let characterFlaws = generateTraits(characterClass, flaws, false, true, lifestyle);
+
+    let native = Math.random() > 0.15;
+    let hometown;
+    if (native) {
+      hometown = rand(hometowns[race]);
+    } else {
+      hometown = rand(hometowns[rand(Object.keys(hometowns))]);
+    }
+
+    let knewParents = lifestyle === "A Noble" || lifestyle === "Royalty" || Math.random() > 0.05;
+    let parents = generateParents(knewParents, race, name);
 
     //No idea if js is pbv or pbr so this should do the trick
     let sanitised = removeMutallyExclusiveTraits(characterDrives, characterIdeals, characterFlaws, characterClass);
@@ -243,14 +352,14 @@ export default function Creator() {
     characterFlaws = sanitised[2];
 
     setData({
-      name: generateName(race, gender, characterClass),
+      name: name,
       gender: gender,
       characterClass: characterClass,
       race: race,
       lifestyle: lifestyle,
       birthsign: rand(birthsigns),
 
-      age: generateAge(race),
+      age: age,
       factions: generateFactions(characterClass, isVampire, buildSensibleCharacters),
 
       isNerevarine: isNerevarine,
@@ -260,6 +369,11 @@ export default function Creator() {
       drives: characterDrives,
       ideals: characterIdeals,
       flaws: characterFlaws,
+
+      hometown: hometown,
+      parents: parents,
+      familyAndFriends: familyAndFriends(characterClass, parents, lifestyle),
+      lifeEvents: generateBackstory(characterClass, age, lifestyle)
     });
   }
 
