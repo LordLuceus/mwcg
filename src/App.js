@@ -5,6 +5,8 @@ import { generateBackstory } from './Backgrounds'
 import { rand, map } from './Utils'
 import ReactTooltip from 'react-tooltip';
 import { IoMdLock, IoMdUnlock } from 'react-icons/io';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -242,6 +244,7 @@ export default function Creator() {
   const [birthsignLocked, lockBirthsign] = useState(false);
   const [mqLocked, lockMQ] = useState(false);
   const [occultLocked, lockOccult] = useState(false);
+  const [factionsLocked, lockFactions] = useState(false);
 
   const handleOnChangeNpcClasses = () => {
     setNpcClassesChecked(!useNpcClasses);
@@ -337,6 +340,8 @@ export default function Creator() {
     const isVampire = (data && occultLocked) ? data.isVampire : Math.random() > 0.95;
     const isWerewolf = (data && occultLocked) ? data.isWerewolf : !isVampire && Math.random() > 0.95;
 
+    const factions = (data && factionsLocked) ? data.factions : generateFactions(characterClass, isVampire, buildSensibleCharacters);
+
     let characterDrives = generateTraits(characterClass, drives, true);
     let characterIdeals = generateTraits(characterClass, ideals);
     let characterFlaws = generateTraits(characterClass, flaws, false, true, lifestyle);
@@ -367,7 +372,7 @@ export default function Creator() {
       birthsign: birthsign,
 
       age: age,
-      factions: generateFactions(characterClass, isVampire, buildSensibleCharacters),
+      factions: factions,
 
       isNerevarine: isNerevarine,
       isVampire: isVampire,
@@ -410,8 +415,8 @@ export default function Creator() {
         color: 'black',
         fontWeight: 700,
         letterSpacing: 1.5,
-        marginLeft: 'max(calc(50% - 635px), 0px)',
-        marginRight: 'max(calc(50% - 635px), 0px)',
+        marginLeft: 'max(calc(40% - 635px), 0px)',
+        marginRight: 'max(calc(40% - 635px), 0px)',
       }}>
         <div style={{
           display: 'flex',
@@ -438,8 +443,8 @@ export default function Creator() {
       <div
         style={{
           //TODO: Jank fix to center content on larger screens but left align on mobile (dependant on width of children)
-          marginLeft: 'max(calc(50% - 635px), 0px)',
-          marginRight: 'max(calc(50% - 635px), 0px)',
+          marginLeft: 'max(calc(40% - 635px), 0px)',
+          marginRight: 'max(calc(40% - 635px), 0px)',
         }}
       >
         <br />
@@ -462,18 +467,19 @@ export default function Creator() {
                 alignItems: 'stretch'
               }}
             >
-              <LockableStatCard title={'name'} value={data.name} onToggle={lockName} />
-              <LockableStatCard title={'gender'} value={data.gender} onToggle={lockGender} />
-              <LockableStatCard title={'race'} value={data.race} onToggle={lockRace} />
-              <LockableStatCard title={'class'} value={data.characterClass} onToggle={lockClass} />
-              <LockableStatCard title={'birthsign'} value={data.birthsign} onToggle={lockBirthsign} />
-              <LockableStatCard title={'nerevarine'} value={data.isNerevarine ? "Yes" : "No"} onToggle={lockMQ} />
-              <LockableStatCard title={'occult'} value={data.isVampire
+              <StatCard title={'name'} value={data.name} onToggle={lockName} />
+              <LockableDropdownStatCard title={'gender'} options={genders} value={data.gender} onToggle={lockGender} onChange={(selection) => { data.gender = selection.value }} />
+              <LockableDropdownStatCard title={'race'} options={races} value={data.race} onToggle={lockRace} onChange={(selection) => { data.race = selection.value }} />
+              <LockableDropdownStatCard title={'class'} options={playerClasses.concat(npcClasses)} value={data.characterClass} onToggle={lockClass} onChange={(selection) => { data.class = selection.value }} />
+              <LockableDropdownStatCard title={'birthsign'} options={birthsigns} value={data.birthsign} onToggle={lockBirthsign} onChange={(selection) => { data.birthsign = selection.value }} />
+              <LockableDropdownStatCard title={'nerevarine'} options={["Yes", "No"]} value={data.isNerevarine ? "Yes" : "No"} onToggle={lockMQ} onChange={(selection) => { data.isNerevarine = selection.value }} />
+              <LockableDropdownStatCard title={'occult'} options={["None", "Vampire", "Werewolf"]} value={data.isVampire
                 ? "Vampire"
                 : data.isWerewolf
                   ? "Werewolf"
                   : "None"
-              } onToggle={lockOccult} />
+              } onToggle={lockOccult}
+                onChange={(selection) => { data.isVampire = selection.value == "Vampire"; data.isWerewolf = selection.value == "Werewolf" }} />
             </div>
             <div
               style={{
@@ -484,7 +490,7 @@ export default function Creator() {
               }}
             >
               <StatCard title={`Bio`} value={buildDescription(data)} centerText={false} />
-              <StatCard title={`Factions`} value={<div
+              <LockableStatCard title={`Factions`} value={<div
                 style={{
                   display: 'flex',
                   flexDirection: width <= 800 ? 'column' : 'row',
@@ -498,6 +504,8 @@ export default function Creator() {
                   })
                 }
               </div>}
+
+                onToggle={lockFactions}
                 centerText={false} />
               <div style={{
                 display: 'flex',
@@ -548,6 +556,8 @@ export default function Creator() {
   );
 }
 
+//TODO These should all be components in some sort of hierarchy
+
 function StatCard({ title, value, centerText = true, nested = false }) {
   return (
     <div
@@ -597,10 +607,49 @@ function LockableStatCard({ title, value, centerText = true, nested = false, onT
           right: '-5px',
         }}
       >
-        {isLocked ? <IoMdLock /> : <IoMdUnlock />}
         {onToggle(isLocked)}
+        {isLocked ? <IoMdLock /> : <IoMdUnlock />}
       </button>
       <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{title.toUpperCase()}</div>
       <div style={{ fontSize: 20, fontWeight: 500 }}>{value}</div>
+    </div >)
+}
+
+function LockableDropdownStatCard({ title, value, centerText = true, nested = false, options = [], onToggle = () => { }, onChange = () => { } }) {
+
+  const [isLocked, setIsLocked] = useState(false);
+
+  return (
+    <div
+      style={{
+        margin: 10,
+        padding: 15,
+        width: 'calc(100% - 50px)',
+        backgroundColor: nested ? '#EFE1BC' : '#F5DEB3',
+        outline: 'rgba(0,0,0,0.5) solid 3px',
+        borderRadius: 10,
+        textAlign: centerText ? 'center' : 'left',
+        position: 'relative',
+      }}
+    >
+      <button
+        onClick={() => { setIsLocked(!isLocked); }}
+        style={{
+          backgroundColor: 'rgba(0,0,0,0)',
+          outline: 'rgba(0,0,0,0)',
+          borderWidth: 0,
+          fontSize: 24,
+          fontWeight: 700,
+          letterSpacing: 1.5,
+          position: 'absolute',
+          top: '0px',
+          right: '-5px',
+        }}
+      >
+        {onToggle(isLocked)}
+        {isLocked ? <IoMdLock /> : <IoMdUnlock />}
+      </button>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{title.toUpperCase()}</div>
+      <div style={{ fontSize: 20, fontWeight: 500 }}>{<Dropdown options={options} onChange={(selection) => { onChange(selection); setIsLocked(true) }} value={value} />}</div>
     </div >)
 }
