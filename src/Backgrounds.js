@@ -225,11 +225,7 @@ function roll1d(die) {
 }
 
 function getBackground(characterClass) {
-    let backgrounds = getClassBackgrounds(characterClass);
-
-    console.log(backgrounds)
-
-    return rand(backgrounds);
+    return rand(getClassBackgrounds(characterClass));
 }
 
 function getNumberOfLifeEvents(age) {

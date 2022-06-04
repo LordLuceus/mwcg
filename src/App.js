@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import { generateName } from './NameGenerator';
 import { getBestFactionFit } from './SkillFacts'
 import { generateBackstory } from './Backgrounds'
 import { rand, map } from './Utils'
 import ReactTooltip from 'react-tooltip';
+import { IoMdLock, IoMdUnlock } from 'react-icons/io';
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -83,7 +84,6 @@ let flaws = {
   "Stubborn": "If caught committing a crime, you will always resist arrest.",
   "Sentimental": "You never sell your old weapons and armour, but instead display them in your home base.",
   "Bloodlust": "You must kill at least one living thing per day.",
-  "Psycopath": "You must kill an innocent every time you visit a settlement, max once per day.",
   "Alcoholic": "Once per day you must consume at least one of: Ancient Dagoth Brandy, Cyrodiilic Brandy, Flin, Greef, Mazte, Nord Mead, Shein, Sujamma, or Vintage Brandy.",
   "Sugartooth": "Once per day you must consume at least one skooma or moon sugar, and you must be in possession of a skooma pipe at all times.",
   "Prejudiced": "You can only trade with NPCs of your own race.",
@@ -235,6 +235,14 @@ export default function Creator() {
   const { height, width } = useWindowDimensions();
   const [tooltip, showTooltip] = useState(true);
 
+  const [nameLocked, lockName] = useState(false);
+  const [genderLocked, lockGender] = useState(false);
+  const [raceLocked, lockRace] = useState(false);
+  const [classLocked, lockClass] = useState(false);
+  const [birthsignLocked, lockBirthsign] = useState(false);
+  const [mqLocked, lockMQ] = useState(false);
+  const [occultLocked, lockOccult] = useState(false);
+
   const handleOnChangeNpcClasses = () => {
     setNpcClassesChecked(!useNpcClasses);
   };
@@ -280,11 +288,9 @@ export default function Creator() {
 
     if (race != "Dark Elf") {
       while (fatherClass === "Dreamer" || fatherClass === "Ordinator" || fatherClass === "Ordinator Guard" || fatherClass === "Wise Woman" || fatherClass === "Mabrigash") {
-        console.log("Rerolled father class cos it was " + fatherClass);
         fatherClass = rand(npcClasses.concat(playerClasses));
       }
       while (motherClass === "Dreamer" || motherClass === "Ordinator" || motherClass === "Ordinator Guard" || motherClass === "Wise Woman" || motherClass === "Mabrigash") {
-        console.log("Rerolled mother class cos it was " + motherClass);
         motherClass = rand(npcClasses.concat(playerClasses));
       }
     }
@@ -316,19 +322,20 @@ export default function Creator() {
 
   function generateRandomCharacter() {
 
-    const race = rand(races);
-    const gender = rand(genders);
-    const characterClass = useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
+    const race = (data && raceLocked) ? data.race : rand(races);
+    const gender = (data && genderLocked) ? data.gender : rand(genders);
+    const characterClass = (data && classLocked) ? data.characterClass : useNpcClasses ? rand(playerClasses.concat(npcClasses)) : rand(playerClasses);
 
-    const name = generateName(race, gender, characterClass);
+    const name = (data && nameLocked) ? data.name : generateName(race, gender, characterClass);
 
     const age = generateAge(race);
 
     const lifestyle = rand(lifestyles);
+    const birthsign = (data && birthsignLocked) ? data.birthsign : rand(birthsigns);
 
-    const isNerevarine = Math.random() > 0.5;
-    const isVampire = Math.random() > 0.95;
-    const isWerewolf = !isVampire && Math.random() > 0.95;
+    const isNerevarine = (data && mqLocked) ? data.isNerevarine : Math.random() > 0.5;
+    const isVampire = (data && occultLocked) ? data.isVampire : Math.random() > 0.95;
+    const isWerewolf = (data && occultLocked) ? data.isWerewolf : !isVampire && Math.random() > 0.95;
 
     let characterDrives = generateTraits(characterClass, drives, true);
     let characterIdeals = generateTraits(characterClass, ideals);
@@ -357,7 +364,7 @@ export default function Creator() {
       characterClass: characterClass,
       race: race,
       lifestyle: lifestyle,
-      birthsign: rand(birthsigns),
+      birthsign: birthsign,
 
       age: age,
       factions: generateFactions(characterClass, isVampire, buildSensibleCharacters),
@@ -455,18 +462,18 @@ export default function Creator() {
                 alignItems: 'stretch'
               }}
             >
-              <StatCard title={'name'} value={data.name} />
-              <StatCard title={'gender'} value={data.gender} />
-              <StatCard title={'race'} value={data.race} />
-              <StatCard title={'class'} value={data.characterClass} />
-              <StatCard title={'birthsign'} value={data.birthsign} />
-              <StatCard title={'nerevarine'} value={data.isNerevarine ? "Yes" : "No"} />
-              <StatCard title={'occult'} value={data.isVampire
+              <LockableStatCard title={'name'} value={data.name} onToggle={lockName} />
+              <LockableStatCard title={'gender'} value={data.gender} onToggle={lockGender} />
+              <LockableStatCard title={'race'} value={data.race} onToggle={lockRace} />
+              <LockableStatCard title={'class'} value={data.characterClass} onToggle={lockClass} />
+              <LockableStatCard title={'birthsign'} value={data.birthsign} onToggle={lockBirthsign} />
+              <LockableStatCard title={'nerevarine'} value={data.isNerevarine ? "Yes" : "No"} onToggle={lockMQ} />
+              <LockableStatCard title={'occult'} value={data.isVampire
                 ? "Vampire"
                 : data.isWerewolf
                   ? "Werewolf"
                   : "None"
-              } />
+              } onToggle={lockOccult} />
             </div>
             <div
               style={{
@@ -557,4 +564,43 @@ function StatCard({ title, value, centerText = true, nested = false }) {
       <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{title.toUpperCase()}</div>
       <div style={{ fontSize: 20, fontWeight: 500 }}>{value}</div>
     </div>)
+}
+
+function LockableStatCard({ title, value, centerText = true, nested = false, onToggle = () => { } }) {
+
+  const [isLocked, setIsLocked] = useState(false);
+
+  return (
+    <div
+      style={{
+        margin: 10,
+        padding: 15,
+        width: 'calc(100% - 50px)',
+        backgroundColor: nested ? '#EFE1BC' : '#F5DEB3',
+        outline: 'rgba(0,0,0,0.5) solid 3px',
+        borderRadius: 10,
+        textAlign: centerText ? 'center' : 'left',
+        position: 'relative',
+      }}
+    >
+      <button
+        onClick={() => { setIsLocked(!isLocked); }}
+        style={{
+          backgroundColor: 'rgba(0,0,0,0)',
+          outline: 'rgba(0,0,0,0)',
+          borderWidth: 0,
+          fontSize: 24,
+          fontWeight: 700,
+          letterSpacing: 1.5,
+          position: 'absolute',
+          top: '0px',
+          right: '-5px',
+        }}
+      >
+        {isLocked ? <IoMdLock /> : <IoMdUnlock />}
+        {onToggle(isLocked)}
+      </button>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{title.toUpperCase()}</div>
+      <div style={{ fontSize: 20, fontWeight: 500 }}>{value}</div>
+    </div >)
 }
