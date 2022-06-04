@@ -245,6 +245,9 @@ export default function Creator() {
   const [mqLocked, lockMQ] = useState(false);
   const [occultLocked, lockOccult] = useState(false);
   const [factionsLocked, lockFactions] = useState(false);
+  const [drivesLocked, lockDrives] = useState(false);
+  const [idealsLocked, lockIdeals] = useState(false);
+  const [flawsLocked, lockFlaws] = useState(false);
 
   const handleOnChangeNpcClasses = () => {
     setNpcClassesChecked(!useNpcClasses);
@@ -342,9 +345,9 @@ export default function Creator() {
 
     const factions = (data && factionsLocked) ? data.factions : generateFactions(characterClass, isVampire, buildSensibleCharacters);
 
-    let characterDrives = generateTraits(characterClass, drives, true);
-    let characterIdeals = generateTraits(characterClass, ideals);
-    let characterFlaws = generateTraits(characterClass, flaws, false, true, lifestyle);
+    let characterDrives = (data && drivesLocked) ? data.drives : generateTraits(characterClass, drives, true);
+    let characterIdeals = (data && idealsLocked) ? data.ideals : generateTraits(characterClass, ideals);
+    let characterFlaws = (data && flawsLocked) ? data.flaws : generateTraits(characterClass, flaws, false, true, lifestyle);
 
     let native = Math.random() > 0.15;
     let hometown;
@@ -504,7 +507,6 @@ export default function Creator() {
                   })
                 }
               </div>}
-
                 onToggle={lockFactions}
                 centerText={false} />
               <div style={{
@@ -513,7 +515,7 @@ export default function Creator() {
                 alignItems: 'start',
 
               }}>
-                <StatCard title={`Drives`} value={<div style={{
+                <LockableStatCard title={`Drives`} value={<div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'start'
@@ -523,8 +525,9 @@ export default function Creator() {
                       return <StatCard title={key} value={data.drives[key]} nested={true} />
                     })
                   }
-                </div>} />
-                <StatCard title={`Ideals`} value={<div style={{
+                </div>}
+                  onToggle={lockDrives} />
+                <LockableStatCard title={`Ideals`} value={<div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'start'
@@ -534,8 +537,9 @@ export default function Creator() {
                       return <StatCard title={key} value={data.ideals[key]} nested={true} />
                     })
                   }
-                </div>} />
-                <StatCard title={`Flaws`} value={<div style={{
+                </div>}
+                  onToggle={lockIdeals} />
+                <LockableStatCard title={`Flaws`} value={<div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'start'
@@ -545,7 +549,8 @@ export default function Creator() {
                       return <StatCard title={key} value={data.flaws[key]} nested={true} />
                     })
                   }
-                </div>} />
+                </div>}
+                  onToggle={lockFlaws} />
               </div>
             </div>
           </div>
