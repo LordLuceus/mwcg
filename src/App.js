@@ -234,6 +234,8 @@ export default function Creator() {
   const [data, setData] = useState();
   const [useNpcClasses, setNpcClassesChecked] = useState(false);
   const [buildSensibleCharacters, setSensibleCharsChecked] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
   const { height, width } = useWindowDimensions();
   const [tooltip, showTooltip] = useState(true);
 
@@ -249,11 +251,15 @@ export default function Creator() {
   const [idealsLocked, lockIdeals] = useState(false);
   const [flawsLocked, lockFlaws] = useState(false);
 
+
   const handleOnChangeNpcClasses = () => {
     setNpcClassesChecked(!useNpcClasses);
   };
   const handleOnChangeSensibleChars = () => {
     setSensibleCharsChecked(!buildSensibleCharacters);
+  };
+  const handleOnChangeDarkMode = () => {
+    setDarkMode(!darkMode);
   };
 
   function generateParents(knewParents, race, name) {
@@ -393,16 +399,28 @@ export default function Creator() {
   }
 
   return (
-    <div class="App">
+    <div
+      style={{
+        alignItems: 'normal',
+        textAlign: 'center',
+        color: '#000000',
+        display: 'flex',
+        flexDirection: 'column',
+        fontSize: 'calc(10px + 2vmin)',
+        justifyContent: 'top',
+        minHeight: '100vh',
+        padding: '20px 8px',
+        backgroundColor: darkMode ? '#121212' : '#FBEFD5',
+      }}>
       <button onClick={generateRandomCharacter}
         style={{
           padding: '8px 20px',
           marginBottom: 20,
-          backgroundColor: '#F5DEB3',
+          backgroundColor: darkMode ? '#1F1B24' : '#F5DEB3',
+          color: darkMode ? 'white' : 'black',
           outline: 'rgba(0,0,0,0.5) solid 3px',
           borderRadius: 100,
           fontSize: 18,
-          color: 'black',
           fontWeight: 700,
           letterSpacing: 1.5,
         }}
@@ -412,10 +430,10 @@ export default function Creator() {
       <div style={{
         padding: '8px 20px',
         marginBottom: 20,
-        backgroundColor: '#F5DEB3',
+        backgroundColor: darkMode ? '#1F1B24' : '#F5DEB3',
+        color: darkMode ? 'white' : 'black',
         outline: 'rgba(0,0,0,0.5) solid 3px',
         fontSize: 18,
-        color: 'black',
         fontWeight: 700,
         letterSpacing: 1.5,
         marginLeft: 'max(calc(40% - 635px), 0px)',
@@ -441,6 +459,7 @@ export default function Creator() {
             }}>
             <input type="checkbox" id="sensibleChars" name="sensibleChars" value="sensibleChars" checked={buildSensibleCharacters} onChange={handleOnChangeSensibleChars} />Sensible Characters
           </div>
+          <div>            <input type="checkbox" id="darkMode" name="darkMode" value="darkMode" checked={darkMode} onChange={handleOnChangeDarkMode} />Dark Mode</div>
         </div>
       </div>
       <div
@@ -470,19 +489,19 @@ export default function Creator() {
                 alignItems: 'stretch'
               }}
             >
-              <StatCard title={'name'} value={data.name} onToggle={lockName} />
-              <LockableDropdownStatCard title={'gender'} options={genders} value={data.gender} onToggle={lockGender} onChange={(selection) => { data.gender = selection.value }} />
-              <LockableDropdownStatCard title={'race'} options={races} value={data.race} onToggle={lockRace} onChange={(selection) => { data.race = selection.value }} />
-              <LockableDropdownStatCard title={'class'} options={playerClasses.concat(npcClasses)} value={data.characterClass} onToggle={lockClass} onChange={(selection) => { data.class = selection.value }} />
-              <LockableDropdownStatCard title={'birthsign'} options={birthsigns} value={data.birthsign} onToggle={lockBirthsign} onChange={(selection) => { data.birthsign = selection.value }} />
-              <LockableDropdownStatCard title={'nerevarine'} options={["Yes", "No"]} value={data.isNerevarine ? "Yes" : "No"} onToggle={lockMQ} onChange={(selection) => { data.isNerevarine = selection.value }} />
+              <StatCard title={'name'} value={data.name} onToggle={lockName} darkMode={darkMode} />
+              <LockableDropdownStatCard title={'gender'} options={genders} value={data.gender} onToggle={lockGender} onChange={(selection) => { data.gender = selection.value }} darkMode={darkMode} />
+              <LockableDropdownStatCard title={'race'} options={races} value={data.race} onToggle={lockRace} onChange={(selection) => { data.race = selection.value }} darkMode={darkMode} />
+              <LockableDropdownStatCard title={'class'} options={playerClasses.concat(npcClasses)} value={data.characterClass} onToggle={lockClass} onChange={(selection) => { data.class = selection.value }} darkMode={darkMode} />
+              <LockableDropdownStatCard title={'birthsign'} options={birthsigns} value={data.birthsign} onToggle={lockBirthsign} onChange={(selection) => { data.birthsign = selection.value }} darkMode={darkMode} />
+              <LockableDropdownStatCard title={'nerevarine'} options={["Yes", "No"]} value={data.isNerevarine ? "Yes" : "No"} onToggle={lockMQ} onChange={(selection) => { data.isNerevarine = selection.value }} darkMode={darkMode} />
               <LockableDropdownStatCard title={'occult'} options={["None", "Vampire", "Werewolf"]} value={data.isVampire
                 ? "Vampire"
                 : data.isWerewolf
                   ? "Werewolf"
                   : "None"
               } onToggle={lockOccult}
-                onChange={(selection) => { data.isVampire = selection.value == "Vampire"; data.isWerewolf = selection.value == "Werewolf" }} />
+                onChange={(selection) => { data.isVampire = selection.value == "Vampire"; data.isWerewolf = selection.value == "Werewolf" }} darkMode={darkMode} />
             </div>
             <div
               style={{
@@ -492,7 +511,7 @@ export default function Creator() {
                 // minWidth: 480,
               }}
             >
-              <StatCard title={`Bio`} value={buildDescription(data)} centerText={false} />
+              <StatCard title={`Bio`} value={buildDescription(data)} centerText={false} darkMode={darkMode} />
               <LockableStatCard title={`Factions`} value={<div
                 style={{
                   display: 'flex',
@@ -502,19 +521,20 @@ export default function Creator() {
                 {
                   Object.keys(data.factions).map(function (title, i) {
                     return data.factions[title].length > 0 && Object.keys(data.factions[title]).map(function (faction, j) {
-                      return <StatCard title={title} value={data.factions[title][faction]} nested={true} />
+                      return <StatCard title={title} value={data.factions[title][faction]} nested={true} darkMode={darkMode} />
                     })
                   })
                 }
               </div>}
                 onToggle={lockFactions}
-                centerText={false} />
+                centerText={false} darkMode={darkMode} />
               <div style={{
                 display: 'flex',
                 flexDirection: width <= 800 ? 'column' : 'row',
                 alignItems: 'start',
 
-              }}>
+              }}
+                darkMode={darkMode}>
                 <LockableStatCard title={`Drives`} value={<div style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -522,11 +542,11 @@ export default function Creator() {
                 }}>
                   {
                     Object.keys(data.drives).map(function (key, i) {
-                      return <StatCard title={key} value={data.drives[key]} nested={true} />
+                      return <StatCard title={key} value={data.drives[key]} nested={true} darkMode={darkMode} />
                     })
                   }
                 </div>}
-                  onToggle={lockDrives} />
+                  onToggle={lockDrives} darkMode={darkMode} />
                 <LockableStatCard title={`Ideals`} value={<div style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -534,11 +554,11 @@ export default function Creator() {
                 }}>
                   {
                     Object.keys(data.ideals).map(function (key, i) {
-                      return <StatCard title={key} value={data.ideals[key]} nested={true} />
+                      return <StatCard title={key} value={data.ideals[key]} nested={true} darkMode={darkMode} />
                     })
                   }
                 </div>}
-                  onToggle={lockIdeals} />
+                  onToggle={lockIdeals} darkMode={darkMode} />
                 <LockableStatCard title={`Flaws`} value={<div style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -546,31 +566,32 @@ export default function Creator() {
                 }}>
                   {
                     Object.keys(data.flaws).map(function (key, i) {
-                      return <StatCard title={key} value={data.flaws[key]} nested={true} />
+                      return <StatCard title={key} value={data.flaws[key]} nested={true} darkMode={darkMode} />
                     })
                   }
                 </div>}
-                  onToggle={lockFlaws} />
+                  onToggle={lockFlaws} darkMode={darkMode} />
               </div>
             </div>
           </div>
         }
       </div>
 
-    </div>
+    </div >
   );
 }
 
 //TODO These should all be components in some sort of hierarchy
 
-function StatCard({ title, value, centerText = true, nested = false }) {
+function StatCard({ title, value, centerText = true, nested = false, darkMode = false }) {
   return (
     <div
       style={{
         margin: 10,
         padding: 15,
         width: 'calc(100% - 50px)',
-        backgroundColor: nested ? '#EFE1BC' : '#F5DEB3',
+        backgroundColor: nested ? darkMode ? '#332940' : '#EFE1BC' : darkMode ? '#1F1B24' : '#F5DEB3',
+        color: darkMode ? 'white' : 'black',
         outline: 'rgba(0,0,0,0.5) solid 3px',
         borderRadius: 10,
         textAlign: centerText ? 'center' : 'left',
@@ -581,7 +602,7 @@ function StatCard({ title, value, centerText = true, nested = false }) {
     </div>)
 }
 
-function LockableStatCard({ title, value, centerText = true, nested = false, onToggle = () => { } }) {
+function LockableStatCard({ title, value, centerText = true, nested = false, onToggle = () => { }, darkMode = false }) {
 
   const [isLocked, setIsLocked] = useState(false);
 
@@ -591,7 +612,8 @@ function LockableStatCard({ title, value, centerText = true, nested = false, onT
         margin: 10,
         padding: 15,
         width: 'calc(100% - 50px)',
-        backgroundColor: nested ? '#EFE1BC' : '#F5DEB3',
+        backgroundColor: nested ? darkMode ? '#332940' : '#EFE1BC' : darkMode ? '#1F1B24' : '#F5DEB3',
+        color: darkMode ? 'white' : 'black',
         outline: 'rgba(0,0,0,0.5) solid 3px',
         borderRadius: 10,
         textAlign: centerText ? 'center' : 'left',
@@ -613,14 +635,14 @@ function LockableStatCard({ title, value, centerText = true, nested = false, onT
         }}
       >
         {onToggle(isLocked)}
-        {isLocked ? <IoMdLock /> : <IoMdUnlock />}
+        {isLocked ? <IoMdLock color={darkMode ? 'white' : 'black'} /> : <IoMdUnlock color={darkMode ? 'white' : 'black'} />}
       </button>
       <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{title.toUpperCase()}</div>
       <div style={{ fontSize: 20, fontWeight: 500 }}>{value}</div>
     </div >)
 }
 
-function LockableDropdownStatCard({ title, value, centerText = true, nested = false, options = [], onToggle = () => { }, onChange = () => { } }) {
+function LockableDropdownStatCard({ title, value, centerText = true, nested = false, options = [], onToggle = () => { }, onChange = () => { }, darkMode = false }) {
 
   const [isLocked, setIsLocked] = useState(false);
 
@@ -630,7 +652,8 @@ function LockableDropdownStatCard({ title, value, centerText = true, nested = fa
         margin: 10,
         padding: 15,
         width: 'calc(100% - 50px)',
-        backgroundColor: nested ? '#EFE1BC' : '#F5DEB3',
+        backgroundColor: nested ? darkMode ? '#332940' : '#EFE1BC' : darkMode ? '#1F1B24' : '#F5DEB3',
+        color: darkMode ? 'white' : 'black',
         outline: 'rgba(0,0,0,0.5) solid 3px',
         borderRadius: 10,
         textAlign: centerText ? 'center' : 'left',
@@ -652,7 +675,7 @@ function LockableDropdownStatCard({ title, value, centerText = true, nested = fa
         }}
       >
         {onToggle(isLocked)}
-        {isLocked ? <IoMdLock /> : <IoMdUnlock />}
+        {isLocked ? <IoMdLock color={darkMode ? 'white' : 'black'} /> : <IoMdUnlock color={darkMode ? 'white' : 'black'} />}
       </button>
       <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{title.toUpperCase()}</div>
       <div style={{ fontSize: 20, fontWeight: 500 }}>{<Dropdown options={options} onChange={(selection) => { onChange(selection); setIsLocked(true) }} value={value} />}</div>
