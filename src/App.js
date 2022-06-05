@@ -412,7 +412,16 @@ export default function Creator() {
         padding: '20px 8px',
         backgroundColor: darkMode ? '#121212' : '#FBEFD5',
       }}>
-      <button onClick={generateRandomCharacter}
+      <div
+        style={{
+          //TODO: Jank fix to center content on larger screens but left align on mobile (dependant on width of children)
+          marginLeft: 'max(calc(40% - 635px), 0px)',
+          marginRight: 'max(calc(40% - 635px), 0px)',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+         <button onClick={generateRandomCharacter}
         style={{
           padding: '8px 20px',
           marginBottom: 20,
@@ -436,8 +445,6 @@ export default function Creator() {
         fontSize: 18,
         fontWeight: 700,
         letterSpacing: 1.5,
-        marginLeft: 'max(calc(40% - 635px), 0px)',
-        marginRight: 'max(calc(40% - 635px), 0px)',
       }}>
         <div style={{
           display: 'flex',
@@ -462,13 +469,6 @@ export default function Creator() {
           <div>            <input type="checkbox" id="darkMode" name="darkMode" value="darkMode" checked={darkMode} onChange={handleOnChangeDarkMode} />Dark Mode</div>
         </div>
       </div>
-      <div
-        style={{
-          //TODO: Jank fix to center content on larger screens but left align on mobile (dependant on width of children)
-          marginLeft: 'max(calc(40% - 635px), 0px)',
-          marginRight: 'max(calc(40% - 635px), 0px)',
-        }}
-      >
         <br />
         {
           data &&
