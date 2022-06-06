@@ -1,10 +1,13 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateName } from './NameGenerator';
 import { getBestFactionFit } from './SkillFacts'
 import { generateBackstory } from './Backgrounds'
 import { rand, map } from './Utils'
+
 import ReactTooltip from 'react-tooltip';
+
 import { IoMdLock, IoMdUnlock } from 'react-icons/io';
+
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
@@ -234,7 +237,18 @@ export default function Creator() {
   const [data, setData] = useState();
   const [useNpcClasses, setNpcClassesChecked] = useState(false);
   const [buildSensibleCharacters, setSensibleCharsChecked] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+
+  const [darkMode, setDarkMode] = useState(() => {
+    // getting stored value
+    const saved = localStorage.getItem("darkMode");
+    const initialValue = saved === "dark";
+    return initialValue;
+  });
+
+  useEffect(() => {
+    // storing input name
+    localStorage.setItem("darkMode", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   const { height, width } = useWindowDimensions();
   const [tooltip, showTooltip] = useState(true);
@@ -421,54 +435,56 @@ export default function Creator() {
           flexDirection: 'column',
         }}
       >
-         <button onClick={generateRandomCharacter}
-        style={{
+        <button onClick={generateRandomCharacter}
+          style={{
+            padding: '8px 20px',
+            marginBottom: 20,
+            backgroundColor: darkMode ? '#1F1B24' : '#F5DEB3',
+            color: darkMode ? 'white' : 'black',
+            outline: 'rgba(0,0,0,0.5) solid 3px',
+            marginLeft: 'max(calc(60% - 635px), 0px)',
+            marginRight: 'max(calc(60% - 635px), 0px)',
+            borderRadius: 100,
+            fontSize: 18,
+            fontWeight: 700,
+            letterSpacing: 1.5,
+          }}
+        >
+          GENERATE NEW CHARACTER
+        </button>
+        <div style={{
           padding: '8px 20px',
           marginBottom: 20,
           backgroundColor: darkMode ? '#1F1B24' : '#F5DEB3',
           color: darkMode ? 'white' : 'black',
           outline: 'rgba(0,0,0,0.5) solid 3px',
-          borderRadius: 100,
           fontSize: 18,
           fontWeight: 700,
           letterSpacing: 1.5,
-        }}
-      >
-        GENERATE NEW CHARACTER
-      </button>
-      <div style={{
-        padding: '8px 20px',
-        marginBottom: 20,
-        backgroundColor: darkMode ? '#1F1B24' : '#F5DEB3',
-        color: darkMode ? 'white' : 'black',
-        outline: 'rgba(0,0,0,0.5) solid 3px',
-        fontSize: 18,
-        fontWeight: 700,
-        letterSpacing: 1.5,
-      }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: width <= 800 ? 'row' : 'row',
-          alignItems: 'start',
-          justifyContent: 'center',
-          gap: '10px'
         }}>
-          <input type="checkbox" id="npcClasses" name="npcClasses" value="npcClasses" checked={useNpcClasses} onChange={handleOnChangeNpcClasses} />Use NPC Classes
-          {tooltip && <ReactTooltip effect="solid" />}
-          <div data-tip="Attempts to match up factions with your character's class"
-            onMouseEnter={() => {
-              showTooltip(true)
-            }
-            }
-            onMouseLeave={() => {
-              showTooltip(false);
-              setTimeout(() => showTooltip(true), 50);
-            }}>
-            <input type="checkbox" id="sensibleChars" name="sensibleChars" value="sensibleChars" checked={buildSensibleCharacters} onChange={handleOnChangeSensibleChars} />Sensible Characters
+          <div style={{
+            display: 'flex',
+            flexDirection: width <= 800 ? 'row' : 'row',
+            alignItems: 'start',
+            justifyContent: 'center',
+            gap: '10px'
+          }}>
+            <input type="checkbox" id="npcClasses" name="npcClasses" value="npcClasses" checked={useNpcClasses} onChange={handleOnChangeNpcClasses} />Use NPC Classes
+            {tooltip && <ReactTooltip effect="solid" />}
+            <div data-tip="Attempts to match up factions with your character's class"
+              onMouseEnter={() => {
+                showTooltip(true)
+              }
+              }
+              onMouseLeave={() => {
+                showTooltip(false);
+                setTimeout(() => showTooltip(true), 50);
+              }}>
+              <input type="checkbox" id="sensibleChars" name="sensibleChars" value="sensibleChars" checked={buildSensibleCharacters} onChange={handleOnChangeSensibleChars} />Sensible Characters
+            </div>
+            <div>            <input type="checkbox" id="darkMode" name="darkMode" value="darkMode" checked={darkMode} onChange={handleOnChangeDarkMode} />Dark Mode</div>
           </div>
-          <div>            <input type="checkbox" id="darkMode" name="darkMode" value="darkMode" checked={darkMode} onChange={handleOnChangeDarkMode} />Dark Mode</div>
         </div>
-      </div>
         <br />
         {
           data &&
